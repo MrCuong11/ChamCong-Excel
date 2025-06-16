@@ -11,18 +11,36 @@ public class ChamCongProcessor {
 
     static Map<String, GiaCa> bangGia = new HashMap<>();
 
-    static {
-        bangGia.put("Nguyen Van A", new GiaCa(216346, 180288, 156250, 240385, 240385));
-        bangGia.put("Nguyen Van B", new GiaCa(72115, 108173, 93750, 144231, 144231));
-        bangGia.put("Nguyen Van C", new GiaCa(43269, 64904, 56250, 86538, 86538));
-        bangGia.put("Nguyen Van D", new GiaCa(38462, 57692, 50000, 76923, 76923));
+    static void docBangGia(Sheet sheet) {
+    for (int i = 5; i <= sheet.getLastRowNum(); i++) {
+        Row row = sheet.getRow(i);
+        if (row == null) continue;
+
+        Cell cellName = row.getCell(2); // Cột C: Họ tên (index 2)
+        if (cellName == null) continue;
+        String hoTen = cellName.getStringCellValue().trim();
+        if (hoTen.isEmpty()) continue;
+
+        double cn   = getDoubleCell(row.getCell(4));  // Cột E: CN
+        double gc   = getDoubleCell(row.getCell(6));  // Cột G: GC
+        double tc   = getDoubleCell(row.getCell(8));  // Cột I: TC
+        double gc1  = getDoubleCell(row.getCell(10)); // Cột K: GC1
+        double tc1  = getDoubleCell(row.getCell(12)); // Cột M: TC1
+        double wk   = getDoubleCell(row.getCell(15)); // Cột P: WK
+
+        GiaCa giaCa = new GiaCa(cn, gc, tc, gc1, tc1, wk);
+
+        bangGia.put(hoTen, giaCa);
     }
+}
 
     public static void main(String[] args) throws Exception {
         // Đọc file Excel
         FileInputStream fis = new FileInputStream(new File("C:/Users/NGUYEN MANH CUONG/Downloads/BangCong.xlsx"));
         Workbook workbook = new XSSFWorkbook(fis);
         Sheet sheet = workbook.getSheetAt(0);
+
+        docBangGia(sheet);
 
         // Duyệt qua từng dòng trong sheet (bắt đầu từ dòng 5)
         for (int i = 5; i <= sheet.getLastRowNum(); i++) {
@@ -37,7 +55,7 @@ public class ChamCongProcessor {
             if (hoTen.isEmpty()) continue;
 
             double luongExcel = getDoubleCell(cellLuong);
-            GiaCa giaCa = bangGia.getOrDefault(hoTen, new GiaCa(0, 0, 0, 0, 0));
+            GiaCa giaCa = bangGia.getOrDefault(hoTen, new GiaCa(0,0, 0, 0, 0, 0));
             NhanVien nv = new NhanVien(hoTen, luongExcel, giaCa);
 
             // Duyệt qua từng ngày trong tháng
@@ -53,7 +71,7 @@ public class ChamCongProcessor {
                 // Duyệt qua từng cột trong 1 ngày
                 for (int j = 0; j < soCot; j++) {
                     Cell cell = row.getCell(colStart + j);
-                    String val = (cell == null) ? "" : getCellVaue(cell);
+                    String val = (cell == null) ? "" : getCellValue(cell);
                     if (!val.isEmpty()) {
                         coLam = true;
                         String ca = getCaName(ngay, j);

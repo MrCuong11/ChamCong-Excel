@@ -7,7 +7,8 @@ import java.util.Map;
 public class GiaCa {
     Map<String, Double> donGiaCa = new HashMap<>();
 
-    public GiaCa(double gc, double tc, double gc1, double tc1, double wk) {
+    public GiaCa(double cn, double gc, double tc, double gc1, double tc1, double wk) {
+        donGiaCa.put("CN", cn);
         donGiaCa.put("GC", gc);
         donGiaCa.put("TC", tc);
         donGiaCa.put("GC1", gc1);
