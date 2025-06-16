@@ -7,23 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
 
-public class ChamCongProcesser {
+public class ChamCongProcessor {
 
-    // Cấu hình đơn giá theo từng nhân viên và từng loại ca
-    static class GiaCa {
-        Map<String, Double> donGiaCa = new HashMap<>();
-
-        public GiaCa(double gc, double tc, double gc1, double tc1, double wk) {
-            donGiaCa.put("GC", gc);
-            donGiaCa.put("TC", tc);
-            donGiaCa.put("GC1", gc1);
-            donGiaCa.put("TC1", tc1);
-            donGiaCa.put("WK-D", wk);
-        }
-    }
-
-    // Dữ liệu mẫu bạn đã cung cấp
     static Map<String, GiaCa> bangGia = new HashMap<>();
+
     static {
         bangGia.put("Nguyen Van A", new GiaCa(216346, 180288, 156250, 240385, 240385));
         bangGia.put("Nguyen Van B", new GiaCa(72115, 108173, 93750, 144231, 144231));
@@ -32,101 +19,121 @@ public class ChamCongProcesser {
     }
 
     public static void main(String[] args) throws Exception {
-        FileInputStream fis = new FileInputStream(new File("C:\\Users\\NGUYEN MANH CUONG\\Downloads\\BangCong.xlsx"));
+        // Đọc file Excel
+        FileInputStream fis = new FileInputStream(new File("C:/Users/NGUYEN MANH CUONG/Downloads/BangCong.xlsx"));
         Workbook workbook = new XSSFWorkbook(fis);
         Sheet sheet = workbook.getSheetAt(0);
 
-        // Dòng tiêu đề là dòng 4 (index 3), dữ liệu từ dòng 6 (index 5)
+        // Duyệt qua từng dòng trong sheet (bắt đầu từ dòng 5)
         for (int i = 5; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            Cell cellName = row.getCell(2); // Cột Họ tên
-            Cell cellLuong = row.getCell(15); // Cột Tổng lương
-
+            Cell cellName = row.getCell(2);  // Cột C
+            Cell cellLuong = row.getCell(16);  // Cột Q
             if (cellName == null || cellLuong == null) continue;
 
             String hoTen = cellName.getStringCellValue().trim();
             if (hoTen.isEmpty()) continue;
 
-            double tongLuongThucTe = 0.0;
-            if (cellLuong.getCellType() == CellType.FORMULA) {
-                if (cellLuong.getCachedFormulaResultType() == CellType.NUMERIC) {
-                    tongLuongThucTe = cellLuong.getNumericCellValue();
-                } else if (cellLuong.getCachedFormulaResultType() == CellType.STRING) {
-                    String raw = cellLuong.getStringCellValue().replace(",", "").trim();
-                    try {
-                        tongLuongThucTe = Double.parseDouble(raw);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Không đọc được lương cho nhân viên: " + hoTen);
-                    }
-                }
-            } else if (cellLuong.getCellType() == CellType.NUMERIC) {
-                tongLuongThucTe = cellLuong.getNumericCellValue();
-            } else if (cellLuong.getCellType() == CellType.STRING) {
-                String raw = cellLuong.getStringCellValue().replace(",", "").trim();
-                try {
-                    tongLuongThucTe = Double.parseDouble(raw);
-                } catch (NumberFormatException e) {
-                    System.err.println("Không đọc được lương cho nhân viên: " + hoTen);
-                }
-            }
-
-
-
+            double luongExcel = getDoubleCell(cellLuong);
             GiaCa giaCa = bangGia.getOrDefault(hoTen, new GiaCa(0, 0, 0, 0, 0));
+            NhanVien nv = new NhanVien(hoTen, luongExcel, giaCa);
 
-            Map<String, Double> tongGioTheoCa = new HashMap<>();
-            tongGioTheoCa.put("GC", 0.0);
-            tongGioTheoCa.put("TC", 0.0);
-            tongGioTheoCa.put("GC1", 0.0);
-            tongGioTheoCa.put("TC1", 0.0);
-            tongGioTheoCa.put("WK-D", 0.0);
+            // Duyệt qua từng ngày trong tháng
+            for (int ngay = 1; ngay <= 31; ngay++) {
+                int colStart = getColumnStartIndex(ngay);
+                if (colStart >= row.getLastCellNum()) break;
 
-            // Quét từ cột thứ 16 trở đi (ngày làm việc)
-            for (int j = 16; j < row.getLastCellNum(); j++) {
-                Cell cell = row.getCell(j);
-                if (cell == null) continue;
+                // Tạo đối tượng NgayLamViec cho ngày đó
+                NgayLamViec ngayLam = new NgayLamViec(ngay);
+                boolean coLam = false;
+                int soCot = getSoCotCuaNgay(ngay);
 
-                String val = "";
-                if (cell.getCellType() == CellType.STRING) val = cell.getStringCellValue().trim();
-                else if (cell.getCellType() == CellType.NUMERIC) val = String.valueOf(cell.getNumericCellValue());
-
-                if (val.isEmpty()) continue;
-
-                // Xử lý chuỗi có thể là "GC", "GC+GC", "WK-D", "4+4"
-                String[] parts = val.split("\\+");
-                for (String part : parts) {
-                    part = part.trim().toUpperCase();
-                    if (tongGioTheoCa.containsKey(part)) {
-                        // Nếu là tên ca
-                        tongGioTheoCa.put(part, tongGioTheoCa.get(part) + 4.0); // giả định mỗi ca là 4h
-                    } else {
+                // Duyệt qua từng cột trong 1 ngày
+                for (int j = 0; j < soCot; j++) {
+                    Cell cell = row.getCell(colStart + j);
+                    String val = (cell == null) ? "" : getCellVaue(cell);
+                    if (!val.isEmpty()) {
+                        coLam = true;
+                        String ca = getCaName(ngay, j);
                         try {
-                            double hours = Double.parseDouble(part);
-                            tongGioTheoCa.put("GC", tongGioTheoCa.get("GC") + hours); // nếu chỉ là số, gán vào GC
-                        } catch (NumberFormatException ignored) {}
+                            double gio = Double.parseDouble(val);
+                            ngayLam.congGio(ca, gio);
+                        } catch (NumberFormatException ignored) {
+                        }
                     }
                 }
+                if (coLam) nv.themNgayLam(ngayLam);
             }
-
-            // Tính tổng tiền
-            double tongLuongTinhToan = 0.0;
-            for (String ca : tongGioTheoCa.keySet()) {
-                double gio = tongGioTheoCa.get(ca);
-                double gia = giaCa.donGiaCa.getOrDefault(ca, 0.0);
-                tongLuongTinhToan += gio * gia;
-            }
-
-            System.out.println("===== " + hoTen + " =====");
-            System.out.printf("Tổng lương file Excel: %.0f VND%n", tongLuongThucTe);
-            System.out.printf("Tổng lương tính toán: %.0f VND%n", tongLuongTinhToan);
-            System.out.printf("Chênh lệch: %.0f VND%n", tongLuongTinhToan - tongLuongThucTe);
-            System.out.println("Chi tiết giờ theo ca: " + tongGioTheoCa);
-            System.out.println();
+            nv.inThongTin();
         }
-
         workbook.close();
         fis.close();
+    }
+
+    static int getSoCotCuaNgay(int ngay) {
+        return switch (ngay) {
+            case 5, 12, 19, 26 -> 2;
+            case 1, 2, 3, 4, 6 -> 5;
+            default -> 4;
+        };
+    }
+
+    // Lấy vị trí cột bắt đầu của ngày đó
+    static int getColumnStartIndex(int ngay) {
+        int index = 17; // cột R
+        for (int i = 1; i < ngay; i++) {
+            index += getSoCotCuaNgay(i);
+        }
+        return index;
+    }
+
+    // Lấy tên ca từ vị trí cột
+    static String getCaName(int ngay, int index) {
+        return switch (getSoCotCuaNgay(ngay)) {
+            case 5 -> switch (index) {
+                case 0 -> "CN";
+                case 1 -> "GC";
+                case 2 -> "TC";
+                case 3 -> "GC1";
+                case 4 -> "TC1";
+                default -> "GC";
+            };
+            case 2 -> (index == 0) ? "WK-D" : "WK-N";
+            default -> switch (index) {
+                case 0 -> "GC";
+                case 1 -> "TC";
+                case 2 -> "GC1";
+                case 3 -> "TC1";
+                default -> "GC";
+            };
+        };
+    }
+
+    // Lấy giá trị số từ ô Excel
+    static double getDoubleCell(Cell cell) {
+        try {
+            if (cell.getCellType() == CellType.NUMERIC) return cell.getNumericCellValue();
+            if (cell.getCellType() == CellType.STRING) return Double.parseDouble(cell.getStringCellValue().replace(",", ""));
+            // Nếu ô là công thức, kiểm tra xem có phải là số không
+            if (cell.getCellType() == CellType.FORMULA) {
+                // Nếu công thức kết quả là số, trả về giá trị số
+                if (cell.getCachedFormulaResultType() == CellType.NUMERIC) return cell.getNumericCellValue();
+                // Nếu công thức kết quả là chuỗi, chuyển đổi thành số
+                if (cell.getCachedFormulaResultType() == CellType.STRING)
+                    return Double.parseDouble(cell.getStringCellValue().replace(",", ""));
+            }
+        } catch (Exception e) {
+            System.err.println("Không đọc được ô dữ liệu: " + e.getMessage());
+        }
+        return 0.0;
+    }
+
+    // Lấy giá trị chuỗi từ ô Excel
+    static String getCellValue(Cell cell) {
+        if (cell.getCellType() == CellType.STRING) return cell.getStringCellValue().trim();
+        if (cell.getCellType() == CellType.NUMERIC) return String.valueOf(cell.getNumericCellValue());
+        return "";
     }
 }
