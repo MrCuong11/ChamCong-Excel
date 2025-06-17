@@ -7,7 +7,7 @@
     <list default="true" id="99320156-665c-4aac-bca3-cb4936ffb44e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ChamCongProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ChamCongProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/GiaCa.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/GiaCa.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/NhanVien.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/NhanVien.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +86,8 @@
       <option name="presentableId" value="Default" />
       <updated>1750042943224</updated>
       <workItem from="1750042944850" duration="11188000" />
-      <workItem from="1750062399836" duration="957000" />
+      <workItem from="1750062399836" duration="3471000" />
+      <workItem from="1750147548477" duration="2757000" />
     </task>
     <servers />
   </component>

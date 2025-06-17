@@ -30,6 +30,9 @@ public class ChamCongProcessor {
 
         GiaCa giaCa = new GiaCa(cn, gc, tc, gc1, tc1, wk);
 
+        if (bangGia.containsKey(hoTen)) {
+            System.err.println("Cảnh báo: Trùng tên nhân viên trong bảng giá: " + hoTen);
+        }
         bangGia.put(hoTen, giaCa);
     }
 }
@@ -55,7 +58,12 @@ public class ChamCongProcessor {
             if (hoTen.isEmpty()) continue;
 
             double luongExcel = getDoubleCell(cellLuong);
-            GiaCa giaCa = bangGia.getOrDefault(hoTen, new GiaCa(0,0, 0, 0, 0, 0));
+            // GiaCa giaCa = bangGia.getOrDefault(hoTen, new GiaCa(0,0, 0, 0, 0, 0));
+            GiaCa giaCa = bangGia.get(hoTen);
+            if (giaCa == null) {
+                System.err.println("Cảnh báo: Không tìm thấy bảng giá cho nhân viên: " + hoTen);
+                giaCa = new GiaCa(0, 0, 0, 0, 0, 0);
+            }
             NhanVien nv = new NhanVien(hoTen, luongExcel, giaCa);
 
             // Duyệt qua từng ngày trong tháng
