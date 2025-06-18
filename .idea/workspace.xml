@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99320156-665c-4aac-bca3-cb4936ffb44e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/NgayVaCot.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ChamCongProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ChamCongProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/GiaCa.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/GiaCa.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,15 +35,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "nodejs_package_manager_path": "npm"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Application.ChamCongProcessor">
     <configuration name="ChamCongProcessor" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.example.ChamCongProcessor" />
@@ -88,7 +88,9 @@
       <updated>1750042943224</updated>
       <workItem from="1750042944850" duration="11188000" />
       <workItem from="1750062399836" duration="3471000" />
-      <workItem from="1750147548477" duration="6683000" />
+      <workItem from="1750147548477" duration="9108000" />
+      <workItem from="1750181506103" duration="1537000" />
+      <workItem from="1750211710957" duration="5618000" />
     </task>
     <servers />
   </component>
