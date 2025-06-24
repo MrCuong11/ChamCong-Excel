@@ -12,8 +12,8 @@ public class ChamCongProcessor {
     static Map<String, GiaCa> bangGia = new HashMap<>();
 
     static void docBangGia(Sheet sheet) {
-        int dongGiaCa = 5; // Dòng tiêu đề
-        int cotBatDau = 3;
+        int dongGiaCa = 5; // giá ca
+        int cotBatDau = 3; // tiêu đề bảng giá
 
         Row rowTieuDe = sheet.getRow(dongGiaCa);
         // lưu trữ ca
@@ -47,7 +47,7 @@ public class ChamCongProcessor {
             col++;// next sang cột tiếp
         }
 
-        //xet ca cho nhân viên
+        //xet ca cho nhân viên để lưu bảng giá
         for (int i = dongGiaCa + 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row == null) continue;
@@ -82,9 +82,10 @@ public class ChamCongProcessor {
         Row rowNgay = sheet.getRow(3);
         Row rowCa = sheet.getRow(5);
 
-        //duyệt ca trong ngày
+        //duyệt ca trong ngày làm
         List<NgayVaCot> ngayVaCotList = new ArrayList<>();
-        int col = 17; // cột R
+        int colTongLuong = 16;
+        int col = colTongLuong + 1; // cột bắt đầu sau cột tổng lương
         while (col <= rowNgay.getLastCellNum()) {
             Cell cell = rowNgay.getCell(col);
             // nếu là ngày (1,2,3,...)
@@ -92,6 +93,7 @@ public class ChamCongProcessor {
                 int ngay = (int) cell.getNumericCellValue();
                 List<String> cacCa = new ArrayList<>();
                 int nextCol = col;
+                //tim các ca trong ngày, nếu thấy ngày mới thì dừng
                 while (nextCol <= rowNgay.getLastCellNum()) {
                     Cell c = rowNgay.getCell(nextCol);
                     //next col != col => dừng (ngày mới)
@@ -107,7 +109,7 @@ public class ChamCongProcessor {
             }
         }
 
-        // duyệt qua nhân viên
+        // duyệt qua nhân viên để tính công, giờ làm
         for (int i = 6; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row == null) continue;
